@@ -1,0 +1,7 @@
+APPSERVDIR="/opt/appserver"
+AS_CMD="$APPSERVDIR/bin/asadmin"
+JDKDIR="/usr/java/latest"
+MAINTENANCE_FILE="$APPSERVDIR/.maintenance"
+RUNASUSER="<%= scope.lookupvar('sunappserver::runas') %>"
+IMQ_HOME="<%= scope.lookupvar('sunappserver::imq_home') %>"
+IMQ_PORT="<%= scope.lookupvar('sunappserver::imq_port') %>"

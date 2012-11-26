@@ -24,22 +24,15 @@
 #    ensure => 'absent',
 #  }
 #
-class sunappserver($appserver_version=undef, $ensure='present') {
+class sunappserver(
+  $ensure='present',
+  $appserver_version=undef,
+  $runas='appserv',
+  $imq_home='/opt/appserver/imq',
+  $imq_port='7676',
+) {
 
-  if $ensure in [present, absent] {
-  } else {
-    fail('Sunappserver: ensure parameter must be present or absent')
-  }
-
-  if $ensure == 'absent' {
-    $real_appserver_ensure = $ensure
-  } else {
-    if ! $appserver_version {
-      $real_appserver_ensure = 'latest'
-    } else {
-      $real_appserver_ensure = $appserver_version
-    }
-  }
+  include sunappserver::params
 
   case $::operatingsystem {
       redhat, centos: { include sunappserver::redhat }
