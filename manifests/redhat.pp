@@ -27,7 +27,7 @@ class sunappserver::redhat {
   }
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${sunappserver::runas} ${sunappserver::params::appserv_installroot}",
-    onlyif  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${sunappserver::runas}`",
+    unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${sunappserver::runas}`",
     require => Package['sunappserver'],
   }
 
