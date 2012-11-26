@@ -12,6 +12,12 @@ class sunappserver::redhat {
     mode      => '0644',
   }
 
+  file { $sunappserver::imq_home :
+    ensure => directory,
+    owner  => $sunappserver::runas,
+    group  => 'appserv',
+  }
+
   service { 'sunappserver' :
     ensure    => $sunappserver::appserver_status,
     enable    => true,
@@ -23,7 +29,7 @@ class sunappserver::redhat {
     ensure    => $sunappserver::imq_status,
     enable    => true,
     hasstatus => true,
-    require   => Package['sunappserver'],
+    require   => [ Package['sunappserver'], File[$sunappsever::imq_home] ],
   }
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${sunappserver::runas} ${sunappserver::params::appserv_installroot}",
