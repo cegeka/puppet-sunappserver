@@ -12,7 +12,7 @@ class sunappserver::redhat {
     mode      => '0644',
   }
 
-  file { $sunappsever::imq_home :
+  file { $sunappserver::imq_home :
     ensure => directory,
     owner  => $sunappserver::runas,
     group  => 'appserv',
