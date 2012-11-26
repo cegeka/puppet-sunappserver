@@ -13,14 +13,14 @@ class sunappserver::redhat {
   }
 
   service { 'sunappserver' :
-    ensure    => running,
+    ensure    => $sunappserver::appserver_status,
     enable    => true,
     hasstatus => true,
     require   => Service['imq'],
   }
 
   service { 'imq' :
-    ensure    => running,
+    ensure    => $sunappserver::imq_status,
     enable    => true,
     hasstatus => true,
     require   => Package['sunappserver'],

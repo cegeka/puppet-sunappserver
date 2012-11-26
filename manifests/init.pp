@@ -27,7 +27,9 @@
 class sunappserver(
   $ensure='present',
   $appserver_version=undef,
+  $appserver_status='running',
   $runas='appserv',
+  $imq_status='running',
   $imq_home='/opt/appserver/imq',
   $imq_port='7676',
 ) {
