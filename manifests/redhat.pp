@@ -32,10 +32,21 @@ class sunappserver::redhat {
     hasstatus => true,
     require   => File[$sunappserver::imq_home]
   }
+
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${sunappserver::runas} ${sunappserver::params::appserv_installroot}",
     unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${sunappserver::runas}`",
     require => Package['sunappserver'],
+  }
+
+  augeas { "domain/configs/config/jms-service/type/${imq_type_real}" :
+    lens    => 'Xml.lns',
+    incl    => '/opt/appserver/domains/domain1/config/domain.xml',
+    context => '/files/opt/appserver/domains/domain1/config/domain.xml',
+    changes => [
+      "set domain/configs/config/jms-service/#attribute/type ${imq_type_real}",
+    ],
+    onlyif => "match domain/configs/config/jms-service/#attribute/type[. =\"${imq_type_real}\"] size == 0"
   }
 
 }
