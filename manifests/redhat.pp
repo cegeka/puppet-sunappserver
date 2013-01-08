@@ -29,7 +29,7 @@ class sunappserver::redhat {
     ensure    => $sunappserver::imq_status,
     enable    => true,
     hasstatus => true,
-    require   => [ Package['sunappserver'], File[$sunappsever::imq_home] ],
+    require   => [ Package['sunappserver'], File[$sunappserver::imq_home] ],
   }
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${sunappserver::runas} ${sunappserver::params::appserv_installroot}",
