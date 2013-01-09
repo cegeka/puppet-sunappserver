@@ -21,14 +21,14 @@ class sunappserver::config {
     unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${sunappserver::runas}`",
   }
 
-  augeas { "domain/configs/config/jms-service/type/${::imq_type_real}" :
+  augeas { "domain/configs/config/jms-service/type/${sunappserver::imq_type_real}" :
     lens    => 'Xml.lns',
     incl    => '/opt/appserver/domains/domain1/config/domain.xml',
     context => '/files/opt/appserver/domains/domain1/config/domain.xml',
     changes => [
-      "set domain/configs/config/jms-service/#attribute/type ${::imq_type_real}",
+      "set domain/configs/config/jms-service/#attribute/type ${sunappserver::imq_type_real}",
     ],
-    onlyif  => "match domain/configs/config/jms-service/#attribute/type[. =\"${::imq_type_real}\"] size == 0"
+    onlyif  => "match domain/configs/config/jms-service/#attribute/type[. =\"${sunappserver::imq_type_real}\"] size == 0"
   }
 
 }
