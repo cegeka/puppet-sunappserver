@@ -4,6 +4,11 @@
 # This module manages sunappserver.
 # Include it to install the Sun Java System Application Server
 #
+# === Requires:
+#
+#  cegeka/puppet-stdlib
+#
+#
 # === Parameters:
 #
 # [*ensure*] The desired state for the package (default: 'present').
@@ -14,7 +19,7 @@
 #                       - Required: no
 #                       - Content: String
 #
-# [*appserver_status*] The status of the Application Server (default: 'running').
+# [*service_state*] The status of the Application Server (default: 'running').
 #                       - Required: no
 #                       - Content: String
 #
@@ -23,10 +28,6 @@
 #                       - Content: String
 #
 # [*imq_type*] The type of the IMQ Message Broker (default: 'remote').
-#                       - Required: no
-#                       - Content: String
-#
-# [*imq_status*] The status of the IMQ Message Broker (default: 'running').
 #                       - Required: no
 #                       - Content: String
 #
@@ -51,11 +52,9 @@
 class sunappserver(
   $ensure='present',
   $appserver_version=undef,
-  #$appserver_status='running',
   $service_state='running',
   $runas='appserv',
   $imq_type='remote',
-  #$imq_status='running',
   $imq_home='/opt/appserver/imq',
   $imq_port='7676',
 ) {
@@ -92,11 +91,5 @@ class sunappserver(
       fail("Class[sunappserver]: osfamily ${::osfamily} is not supported")
     }
   }
-
-  #case $::operatingsystem {
-  #    redhat, centos: { include sunappserver::redhat }
-  #    debian, ubuntu: { include sunappserver::debian }
-  #    default: { fail("operatingsystem ${::operatingsystem} is not supported") }
-  #}
 
 }
