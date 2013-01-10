@@ -1,9 +1,9 @@
 class sunappserver::params {
 
-  if $sunappserver::ensure in [present, absent] {
-  } else {
-    fail('Sunappserver: ensure parameter must be present or absent')
-  }
+  #if $sunappserver::ensure in [present, absent] {
+  #} else {
+  #  fail('Sunappserver: ensure parameter must be present or absent')
+  #}
 
   if $sunappserver::ensure == 'absent' {
     $real_appserver_ensure = $sunappserver::ensure

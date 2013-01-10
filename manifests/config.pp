@@ -1,4 +1,4 @@
-class sunappserver::config {
+class sunappserver::config($runas=undef, $imq_type=undef, $imq_home=undef) {
 
   include sunappserver::params
 
@@ -10,25 +10,25 @@ class sunappserver::config {
     mode    => '0644',
   }
 
-  file { $sunappserver::imq_home :
+  file { $imq_home :
     ensure => directory,
-    owner  => $sunappserver::runas,
+    owner  => $runas,
     group  => 'appserv'
   }
 
   exec { 'modify-ownership-for-appserver-root' :
-    command => "/bin/chown -R ${sunappserver::runas} ${sunappserver::params::appserv_installroot}",
-    unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${sunappserver::runas}`",
+    command => "/bin/chown -R ${runas} ${sunappserver::params::appserv_installroot}",
+    unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${runas}`",
   }
 
-  augeas { "domain/configs/config/jms-service/type/${sunappserver::imq_type_real}" :
+  augeas { "domain/configs/config/jms-service/type/${imq_type}" :
     lens    => 'Xml.lns',
     incl    => '/opt/appserver/domains/domain1/config/domain.xml',
     context => '/files/opt/appserver/domains/domain1/config/domain.xml',
     changes => [
-      "set domain/configs/config/jms-service/#attribute/type ${sunappserver::imq_type_real}",
+      "set domain/configs/config/jms-service/#attribute/type ${imq_type}",
     ],
-    onlyif  => "match domain/configs/config/jms-service/#attribute/type[. =\"${sunappserver::imq_type_real}\"] size == 0"
+    onlyif  => "match domain/configs/config/jms-service/#attribute/type[. =\"${imq_type}\"] size == 0"
   }
 
 }
