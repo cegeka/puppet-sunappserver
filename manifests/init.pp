@@ -61,6 +61,13 @@ class sunappserver(
 
   include stdlib
 
+  case $service_state {
+    'running', 'stopped': { $service_state_real = $service_state }
+    default: {
+      fail('Class[sunappserver]: parameter service_state must be running or stopped')
+    }
+  }
+
   case $imq_type {
     'remote': {
       $imq_type_real = upcase($imq_type)
@@ -71,7 +78,7 @@ class sunappserver(
       $imq_state = 'stopped'
     }
     default: {
-      fail('Class[sunappserver]: parameter imq_type must be "remote" or "embedded"')
+      fail('Class[sunappserver]: parameter imq_type must be remote or embedded')
     }
   }
 
@@ -79,9 +86,19 @@ class sunappserver(
     'RedHat': {
       include sunappserver::params
 
-      class { 'sunappserver::package': }
-      class { 'sunappserver::config': }
-      class { 'sunappserver::service': }
+      class { 'sunappserver::package':
+        ensure            => $ensure,
+        appserver_version => $appserver_version
+      }
+      class { 'sunappserver::config':
+        runas    => $runas,
+        imq_type => $imq_type_real,
+        imq_home => $imq_home
+      }
+      class { 'sunappserver::service':
+        service_state => $service_state_real,
+        imq_state     => $imq_state
+      }
 
       Class['sunappserver::package'] -> Class['sunappserver::config']
       Class['sunappserver::config'] ~> Class['sunappserver::service']
