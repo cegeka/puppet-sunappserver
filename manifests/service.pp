@@ -2,6 +2,7 @@ class sunappserver::service($service_state=undef, $imq_state=undef) {
 
   include sunappserver::params
 
+  tag('sunappserver_service')
   service { 'sunappserver' :
     ensure    => $service_state,
     enable    => true,
