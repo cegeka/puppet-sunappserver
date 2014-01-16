@@ -11,7 +11,7 @@ describe 'sunappserver::package' do
   context 'with ensure => present and version => 9.1.01' do
     let (:params) { { :ensure => 'present', :appserver_version => '9.1.01' } }
 
-    it { should include_class('sunappserver::params') }
+    it { should contain_class('sunappserver::params') }
     it { should contain_package('sunappserver').with_ensure('9.1.01') }
   end
 
