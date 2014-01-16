@@ -38,7 +38,7 @@ describe 'sunappserver' do
     context 'with default parameters' do
       let (:params) { { } }
 
-      it { should include_class('sunappserver::params') }
+      it { should contain_class('sunappserver::params') }
 
       it { should contain_class('sunappserver').with_ensure('present') }
       it { should contain_class('sunappserver').without_appserver_version }
