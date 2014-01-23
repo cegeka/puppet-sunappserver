@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# Startup script for the SUN Application Server
+#
+# chkconfig: 345 99 15
+# description: SUN Application Server
+
+prog=$( basename ${0} )
+
+. /etc/sysconfig/${prog}
+
+if [ -z "${prog##sunappserver}" ]; then
+  domain="domain1"
+else
+  domain=${prog##sunappserver-}
+fi
+
+case "${1}" in
+  'start' )
+    if [ -f ${MAINTENANCE_FILE} ]; then
+      echo -n "SUN Application Server Domain ${domain} is in maintenance mode"
+    else
+      echo -n "Starting SUN Application Server Domain ${domain}"
+      if [ "${domain}" == "domain1" ]; then
+      	su - ${USER} -c "appserver.sh start"
+      else
+	su - ${USER} -c "appserver-${domain}.sh start"
+      fi
+      echo
+      touch /var/lock/subsys/${prog}
+    fi
+    ;;
+
+  'stop' )
+    echo -n "Shutting down SUN Application Server Domain ${domain}"
+    if [ "${domain}" == "domain1" ]; then
+      su - ${USER} -c "appserver.sh stop"
+    else
+      su - ${USER} -c "appserver-${domain}.sh stop"
+    fi
+    echo
+    rm -f /var/lock/subsys/${prog}
+    ;;
+
+  'status' )
+    if [ -f ${MAINTENANCE_FILE} ]; then
+      echo -n "Sun Application Server Domain ${domain} is in maintenance mode"
+      exit 0
+    else
+      pid=$( pgrep -U ${USER} -f com.sun.aas.instanceRoot=${APPSERVDIR}/domains/${domain} )
+
+      if [ -n "${pid}" ]; then
+        echo "Sun Application Server Domain ${domain} is running"
+        exit 0
+      else
+        echo "Sun Application Server Domain ${domain} is not running"
+        exit 1
+      fi
+    fi
+    ;;
+
+  'restart' )
+    $0 stop
+    $0 start
+    ;;
+
+  'start-maintenance')
+    echo -n "Starting Sun Application Server Domain ${domain} Maintenance Mode"
+    su - ${USER} -c "start-maintenance.sh"
+    echo
+    ;;
+
+  'stop-maintenance')
+    echo -n "Ending Sun Application Server Domain ${domain} Maintenance Mode"
+    su - ${USER} -c "stop-maintenance.sh"
+    echo
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|restart|status|start-maintenance|stop-maintenance}"
+    exit 1
+esac
+
+exit 0
