@@ -55,9 +55,9 @@ class sunappserver(
   $service_state='running',
   $runas='appserv',
   $imq_type='remote',
-  $imq_home='/opt/appserver/imq',
+  $imq_home="${sunappserver::params::appserv_installroot}/imq",
   $imq_port='7676',
-) {
+) inherits sunappserver::params {
 
   include stdlib
 
@@ -84,8 +84,6 @@ class sunappserver(
 
   case $::osfamily {
     'RedHat': {
-      include sunappserver::params
-
       class { 'sunappserver::package':
         ensure            => $ensure,
         appserver_version => $appserver_version
