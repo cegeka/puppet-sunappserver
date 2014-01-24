@@ -19,4 +19,17 @@ describe 'sunappserver::service' do
     it { should contain_service('imq').with_before('Service[sunappserver]') }
   end
 
+  context 'with service_state => running, imq_type => embedded and imq_state => running' do
+    let (:params) { {
+      :service_state => 'running',
+      :imq_type      => 'embedded',
+      :imq_state     => 'running'
+    } }
+
+    it { should contain_class('sunappserver::params') }
+
+    it { should contain_service('sunappserver').with_ensure('running') }
+
+    it { should_not contain_service('imq') }
+  end
 end

@@ -95,6 +95,7 @@ class sunappserver(
       }
       class { 'sunappserver::service':
         service_state => $service_state_real,
+        imq_type      => $imq_type_real,
         imq_state     => $imq_state
       }
 
