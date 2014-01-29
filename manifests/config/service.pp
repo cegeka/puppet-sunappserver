@@ -4,8 +4,8 @@ define sunappserver::config::service (
     $runas               = 'appserv'
   ) {
 
-  if ! defined(Class['sunappserver']) {
-    fail('You must include the sunappserver base class before using any sunappserver defined resources')
+  if ! defined(Class['sunappserver::params']) {
+    fail('You must include the sunappserver::params class before using any sunappserver defined resources')
   }
 
   $suffix = $title ? {
