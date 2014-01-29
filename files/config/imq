@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# Startup script for program Sun Appserver IMQ
+#
+# chkconfig: 345 98 15
+# description: Sun Application Server IMQ
+
+. /etc/sysconfig/imq
+
+case "${1}" in
+  'start' )
+   	if [ -f ${MAINTENANCE_FILE} ]; then
+        	echo -n "Sun Application Server IMQ is in maintenace"
+   	else
+        	echo -n "Starting Sun Application Server IMQ "
+        	su - ${USER} -c "appserver.sh start-imq"
+        	echo
+        	touch /var/lock/subsys/imq
+   	fi
+        ;;
+  'stop' )
+        echo -n "Shutting down Sun Application Server IMQ "
+        su - ${USER} -c "appserver.sh stop-imq"
+        echo
+        rm -f /var/lock/subsys/imq
+        ;;
+  'status' )
+   	if [ -f ${MAINTENANCE_FILE} ]; then
+        	echo -n "Sun Application Server IMQ is in maintenace" && exit 0
+   	else
+        	hostname=$(uname -n)
+        	su - ${USER} -c "${IMQHOME}/bin/imqcmd list bkr -u admin -passfile appserver/bin/domain.imq \
+                -b ${hostname}" | grep "${hostname}:{IMQPORT}" | grep "OPERATING" && exit 0 || exit 1
+   	fi
+        ;;
+  'restart' )
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0

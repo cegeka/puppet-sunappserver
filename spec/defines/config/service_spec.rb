@@ -6,15 +6,15 @@ describe 'sunappserver::config::service' do
   context 'with title foodomain' do
     let (:title) { 'foodomain' }
 
-    context 'without prior inclusion of class sunappserver' do
+    context 'without prior inclusion of class sunappserver::params' do
 
       it { expect { subject }.to raise_error(
-        Puppet::Error, /must include the sunappserver base class before/
+        Puppet::Error, /must include the sunappserver::params class before/
       )}
     end
 
     context 'with prior inclusion of class sunappserver' do
-      let (:pre_condition) { 'include sunappserver' }
+      let (:pre_condition) { 'include sunappserver::params' }
 
       context 'on osfamily RedHat' do
         let (:facts) { {
@@ -136,8 +136,8 @@ describe 'sunappserver::config::service' do
   context 'with title domain1' do
     let (:title) { 'domain1' }
 
-    context 'with prior inclusion of class sunappserver on osfamily RedHat' do
-      let (:pre_condition) { 'include sunappserver' }
+    context 'with prior inclusion of class sunappserver::params on osfamily RedHat' do
+      let (:pre_condition) { 'include sunappserver::params' }
       let (:facts) { {
         :osfamily => 'RedHat'
       } }

@@ -11,7 +11,7 @@
 #
 # === Parameters:
 #
-# [*ensure*] The desired state for the package (default: 'present').
+# [*ensure*] The desired state for the product (default: 'present').
 #            - Required: no
 #            - Content: 'present' | 'absent'
 #
@@ -19,7 +19,8 @@
 #                       - Required: no
 #                       - Content: String
 #
-# [*service_state*] The status of the Application Server (default: 'running').
+# [*service_state*] The status of the Application Server default domain (domain1)
+#                   (default: 'running').
 #                       - Required: no
 #                       - Content: String
 #
@@ -49,14 +50,17 @@
 #    ensure => 'absent',
 #  }
 #
-class sunappserver(
-  $ensure='present',
-  $appserver_version=undef,
-  $service_state='running',
-  $runas='appserv',
-  $imq_type='remote',
-  $imq_home="${sunappserver::params::appserv_installroot}/imq",
-  $imq_port='7676',
+class sunappserver (
+  $ensure              = 'present',
+  $appserver_version   = undef,
+  $appserv_installroot = $sunappserver::params::appserv_installroot,
+  $service_state       = 'running',
+  $service_enable      = true,
+  $runas               = 'appserv',
+  $imq_type            = 'remote',
+  $imq_state           = 'running',
+  $imq_home            = "${sunappserver::params::appserv_installroot}/imq",
+  $imq_port            = $sunappserver::params::imq_port,
 ) inherits sunappserver::params {
 
   include stdlib
@@ -68,44 +72,67 @@ class sunappserver(
     }
   }
 
+  case $imq_state {
+    'running', 'stopped': { $imq_state_real = $imq_state }
+    default: {
+      fail('Class[sunappserver]: parameter imq_state must be running or stopped')
+    }
+  }
+
   case $imq_type {
     'remote': {
       $imq_type_real = upcase($imq_type)
-      $imq_state = $service_state
     }
     'embedded': {
       $imq_type_real = upcase($imq_type)
-      $imq_state = 'stopped'
     }
     default: {
       fail('Class[sunappserver]: parameter imq_type must be remote or embedded')
     }
   }
 
-  case $::osfamily {
-    'RedHat': {
-      class { 'sunappserver::package':
-        ensure            => $ensure,
-        appserver_version => $appserver_version
-      }
-      class { 'sunappserver::config':
-        runas    => $runas,
-        imq_type => $imq_type_real,
-        imq_home => $imq_home
-      }
-      class { 'sunappserver::service':
-        service_state => $service_state_real,
-        imq_type      => $imq_type_real,
-        imq_state     => $imq_state
+  class { 'sunappserver::package':
+    ensure            => $ensure,
+    appserver_version => $appserver_version
+  }
+
+  class { 'sunappserver::config':
+    runas    => $runas,
+    imq_type => $imq_type_real,
+    imq_home => $imq_home
+  }
+
+  sunappserver::config::service { 'domain1':
+    runas               => $runas,
+    appserv_installroot => $appserv_installroot
+  }
+
+  class { 'sunappserver::service':
+    ensure => $service_state_real,
+    enable => $service_enable
+  }
+
+  if $imq_type == 'remote' {
+    class { 'sunappserver::config::imq':
+      runas => $runas
       }
 
-      Class['sunappserver::package'] -> Class['sunappserver::config']
-      Class['sunappserver::config'] ~> Class['sunappserver::service']
-      Class['sunappserver::config'] -> Class['sunappserver']
+    class { 'sunappserver::imq::service':
+      ensure => $imq_state_real
     }
-    default: {
-      fail("Class[sunappserver]: osfamily ${::osfamily} is not supported")
+
+    Class['sunappserver::config::imq'] ~> Class['sunappserver::imq::service']
+    Class['sunappserver::imq::service'] ~> Class['sunappserver::service']
+  }
+  else {
+    class { 'sunappserver::config::imq':
+      ensure => 'absent'
     }
   }
+
+  Class['sunappserver::package'] -> Class['sunappserver::config']
+  Class['sunappserver::config'] ~> Class['sunappserver::service']
+  Class['sunappserver::config'] -> Class['sunappserver']
+  Sunappserver::Config::Service['domain1'] ~> Class['sunappserver::service']
 
 }
