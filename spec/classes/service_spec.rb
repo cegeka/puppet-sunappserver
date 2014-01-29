@@ -8,28 +8,40 @@ describe 'sunappserver::service' do
     :osfamily => 'RedHat'
   } }
 
-  context 'with service_state => running and imq_state => running' do
-    let (:params) { { :service_state => 'running', :imq_state => 'running' } }
-
-    it { should contain_class('sunappserver::params') }
-
-    it { should contain_service('sunappserver').with_ensure('running') }
-
-    it { should contain_service('imq').with_ensure('running') }
-    it { should contain_service('imq').with_before('Service[sunappserver]') }
-  end
-
-  context 'with service_state => running, imq_type => embedded and imq_state => running' do
+  context 'with ensure => present' do
     let (:params) { {
-      :service_state => 'running',
-      :imq_type      => 'embedded',
-      :imq_state     => 'running'
+      :ensure => 'present'
     } }
 
-    it { should contain_class('sunappserver::params') }
+    it { expect { subject }.to raise_error(
+      Puppet::Error, /parameter ensure must be running or stopped/
+    )}
+  end
 
-    it { should contain_service('sunappserver').with_ensure('running') }
+  context 'with ensure => stopped' do
+    let (:params) { {
+      :ensure => 'stopped'
+    } }
 
-    it { should_not contain_service('imq') }
+    it { should contain_service('sunappserver').with(
+      :ensure => 'stopped',
+      :hasstatus => true
+    )}
+  end
+
+  context 'with default parameters' do
+    let (:params) { { } }
+
+    it { should contain_class('sunappserver::service').with(
+      :ensure     => 'running'
+    )}
+  end
+
+  context 'imq_state => running and imq_enable => true' do
+    let (:params) { {
+      :imq_state  => 'running',
+      :imq_enable => true
+    } }
+
   end
 end

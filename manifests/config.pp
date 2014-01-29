@@ -1,14 +1,10 @@
-class sunappserver::config($runas=undef, $imq_type=undef, $imq_home=undef) {
+class sunappserver::config (
+    $runas    = undef,
+    $imq_type = undef,
+    $imq_home = undef
+  ) {
 
   include sunappserver::params
-
-  file { '/etc/sysconfig/sunappserver' :
-    ensure  => file,
-    content => template('sunappserver/sunappserver-sysconfig.erb'),
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-  }
 
   file { $imq_home :
     ensure => directory,

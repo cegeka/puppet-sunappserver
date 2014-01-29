@@ -1,5 +1,12 @@
 class sunappserver::params {
 
-  $appserv_installroot = '/opt/appserver'
-
+  case $osfamily {
+    'RedHat': {
+      $appserv_installroot = '/opt/appserver'
+      $imq_port            = '7676'
+    }
+    default: {
+      fail("Class[sunappserver::params]: osfamily ${::osfamily} is not supported")
+    }
+  }
 }
