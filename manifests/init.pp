@@ -61,6 +61,7 @@ class sunappserver (
   $imq_state           = 'running',
   $imq_home            = "${sunappserver::params::appserv_installroot}/imq",
   $imq_port            = $sunappserver::params::imq_port,
+  $use_default_domain  = true
 ) inherits sunappserver::params {
 
   include stdlib
@@ -102,15 +103,30 @@ class sunappserver (
     imq_home => $imq_home
   }
 
-  sunappserver::config::service { 'domain1':
-    runas               => $runas,
-    appserv_installroot => $appserv_installroot
+  if ( $use_default_domain == true ) {
+    sunappserver::config::service { 'domain1':
+      runas               => $runas,
+      appserv_installroot => $appserv_installroot
+    }
+
+    class { 'sunappserver::service':
+      ensure => $service_state_real,
+      enable => $service_enable
+    }
+
+    Sunappserver::Config::Service['domain1'] ~> Class['sunappserver::service']
+    Class['sunappserver::config'] ~> Class['sunappserver::service']
+  } else {
+    sunappserver::config::service { 'domain1':
+      ensure              => 'absent'
+    }
+
+    file { "${appserv_installroot}/domains/domain1":
+      ensure => 'absent',
+      force  => true
+    }
   }
 
-  class { 'sunappserver::service':
-    ensure => $service_state_real,
-    enable => $service_enable
-  }
 
   if $imq_type == 'remote' {
     class { 'sunappserver::config::imq':
@@ -122,7 +138,10 @@ class sunappserver (
     }
 
     Class['sunappserver::config::imq'] ~> Class['sunappserver::imq::service']
-    Class['sunappserver::imq::service'] ~> Class['sunappserver::service']
+
+    if ( $use_default_domain == true ) {
+      Class['sunappserver::imq::service'] ~> Class['sunappserver::service']
+    }
   }
   else {
     class { 'sunappserver::config::imq':
@@ -131,8 +150,6 @@ class sunappserver (
   }
 
   Class['sunappserver::package'] -> Class['sunappserver::config']
-  Class['sunappserver::config'] ~> Class['sunappserver::service']
   Class['sunappserver::config'] -> Class['sunappserver']
-  Sunappserver::Config::Service['domain1'] ~> Class['sunappserver::service']
 
 }
