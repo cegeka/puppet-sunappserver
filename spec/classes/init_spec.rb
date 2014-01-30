@@ -48,6 +48,7 @@ describe 'sunappserver' do
       it { should contain_class('sunappserver').with_imq_type('remote') }
       it { should contain_class('sunappserver').with_imq_home('/opt/appserver/imq') }
       it { should contain_class('sunappserver').with_imq_port('7676') }
+      it { should contain_class('sunappserver').with_use_default_domain(true) }
 
       it { should contain_class('sunappserver::package').with_ensure('present') }
 
@@ -72,7 +73,7 @@ describe 'sunappserver' do
       let (:params) { { :imq_type => 'remote' } }
 
       it { should contain_class('sunappserver::config::imq') }
-      it { should contain_class('sunappserver::imq::service') }
+      it { should contain_class('sunappserver::imq::service').with_notify('Class[Sunappserver::Service]') }
     end
 
     context 'with imq_type => embedded' do
@@ -82,6 +83,20 @@ describe 'sunappserver' do
       it { should_not contain_class('sunappserver::imq::service') }
     end
 
+    context 'with appserv_installroot and use_default_domain => false' do
+      let (:params) { {
+        :appserv_installroot => '/tmp',
+        :use_default_domain  => false
+      } }
+
+      it { should contain_sunappserver__config__service('domain1').with_ensure('absent') }
+      it { should contain_file('/tmp/domains/domain1').with(
+        :ensure => 'absent',
+        :force  => true
+      )}
+
+      it { should_not contain_class('sunappserver::service') }
+    end
   end
 
   context 'on osfamily Debian' do
