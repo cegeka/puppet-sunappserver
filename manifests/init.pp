@@ -19,10 +19,18 @@
 #                       - Required: no
 #                       - Content: String
 #
+# [*appserv_installroot*] The installation directory of Application Server (default: '/opt/appserver')
+#                         - Required: no
+#                         - Content: String
+#
 # [*service_state*] The status of the Application Server default domain (domain1)
 #                   (default: 'running').
 #                       - Required: no
 #                       - Content: String
+#
+# [*service_enable*] The state of the Application Server default domain service (default: 'running')
+#                    - Required: no
+#                    - Content: 'running' | 'stopped'
 #
 # [*runas*] The user under which the Application Server process is running (default: 'appserv').
 #                       - Required: no
@@ -32,6 +40,10 @@
 #                       - Required: no
 #                       - Content: String
 #
+# [*imq_state*] The state of the IMQ Message Broker service (if the type is remote) (default: 'running')
+#               - Required: no
+#               - Content: 'running' | 'stopped'
+#
 # [*imq_home*] The home of the IMQ Message Broker (default: '/opt/appserver/imq').
 #                       - Required: no
 #                       - Content: String
@@ -39,6 +51,10 @@
 # [*imq_port*] The port of the IMQ Message Broker (default: '7676').
 #                       - Required: no
 #                       - Content: String
+#
+# [*use_default_domain*] Should the default domain (domain1) exist? (default: true)
+#                        - Required: no
+#                        - Content: Boolean
 #
 # === Sample Usage:
 #

@@ -3,3 +3,30 @@
 {<img src='https://codex.cegeka.be/jenkins/job/puppet-sunappserver/badge/icon' />}[https://codex.cegeka.be/jenkins/job/puppet-sunappserver/]
 
 This is the sunappserver module.
+
+== Usage
+
+In its simplest form, the module can be used by simply using:
+
+  include sunappserver
+
+This will install the software, configure the default domain (domain1), configure
+the IMQ service and start both the default domain and the IMQ service.
+
+Running the IMQ embedded in the JVM can be performed by:
+
+  class { 'sunappserver':
+    imq_type => 'embedded'
+  }
+
+If you do not need the default domain, you can use:
+
+  class { 'sunappserver':
+    use_default_domain => false
+  }
+
+If you created an extra domain, you can create the service to start the domain with:
+
+  sunappserver::config::service { 'domain2':
+    runas => 'foo'
+  }
