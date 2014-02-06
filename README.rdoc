@@ -25,8 +25,8 @@ If you do not need the default domain, you can use:
     use_default_domain => false
   }
 
-If you created an extra domain, you can create the service to start the domain with:
+If you created an extra domain, you can create the configuration and service scripts to start the domain with:
 
-  sunappserver::config::service { 'domain2':
+  sunappserver::config::domain { 'domain2':
     runas => 'foo'
   }

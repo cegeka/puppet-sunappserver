@@ -1,4 +1,4 @@
-define sunappserver::config::service (
+define sunappserver::config::domain (
     $ensure              = 'present',
     $appserv_installroot = $sunappserver::params::appserv_installroot,
     $runas               = 'appserv'
@@ -25,6 +25,11 @@ define sunappserver::config::service (
         ensure => $ensure,
         path   => "/etc/sysconfig/sunappserver${suffix}"
       }
+
+      file { "${appserv_installroot}/domains/${title}":
+        ensure => $ensure,
+        force  => true
+      }
     }
     'present': {
       file { "service/sunappserver-${title}":
@@ -33,7 +38,7 @@ define sunappserver::config::service (
         group  => 'root',
         mode   => '0755',
         path   => "/etc/init.d/sunappserver${suffix}",
-        source => 'puppet:///modules/sunappserver/config/service'
+        source => 'puppet:///modules/sunappserver/config/domain'
       }
 
       file { "sysconfig/sunappserver-${title}":
@@ -44,9 +49,15 @@ define sunappserver::config::service (
         path    => "/etc/sysconfig/sunappserver${suffix}",
         content => template('sunappserver/config/sysconfig.erb')
       }
+
+      file { "${appserv_installroot}/domains/${title}":
+        ensure => 'directory',
+        owner  => $runas,
+        mode   => '0750'
+      }
     }
     default: {
-      fail("Sunappserver::Config::Service['${title}']: parameter ensure must be present or absent")
+      fail("Sunappserver::Config::Domain['${title}']: parameter ensure must be present or absent")
     }
   }
 }
