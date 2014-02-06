@@ -120,7 +120,7 @@ class sunappserver (
   }
 
   if ( $use_default_domain == true ) {
-    sunappserver::config::service { 'domain1':
+    sunappserver::config::domain { 'domain1':
       runas               => $runas,
       appserv_installroot => $appserv_installroot
     }
@@ -130,19 +130,16 @@ class sunappserver (
       enable => $service_enable
     }
 
-    Sunappserver::Config::Service['domain1'] ~> Class['sunappserver::service']
+    Sunappserver::Config::Domain['domain1'] ~> Class['sunappserver::service']
     Class['sunappserver::config'] ~> Class['sunappserver::service']
-  } else {
-    sunappserver::config::service { 'domain1':
-      ensure              => 'absent'
-    }
 
-    file { "${appserv_installroot}/domains/domain1":
-      ensure => 'absent',
-      force  => true
+  } else {
+
+    sunappserver::config::domain { 'domain1':
+      ensure              => 'absent',
+      appserv_installroot => $appserv_installroot
     }
   }
-
 
   if $imq_type == 'remote' {
     class { 'sunappserver::config::imq':
@@ -158,8 +155,8 @@ class sunappserver (
     if ( $use_default_domain == true ) {
       Class['sunappserver::imq::service'] ~> Class['sunappserver::service']
     }
-  }
-  else {
+  } else {
+
     class { 'sunappserver::config::imq':
       ensure => 'absent'
     }

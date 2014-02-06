@@ -42,6 +42,11 @@ describe 'sunappserver::config::imq' do
         :ensure => 'absent',
         :path   => '/etc/sysconfig/imq'
       )}
+
+      it { should contain_file('/opt/appserver/imq').with(
+        :ensure => 'absent',
+        :force  => true
+      )}
     end
 
     context 'with default parameters' do
@@ -55,10 +60,10 @@ describe 'sunappserver::config::imq' do
       )}
     end
 
-    context 'ensure => present, imq_home => /tmp and imq_port => 7777' do
+    context 'ensure => present, imq_home => /tmp/imq and imq_port => 7777' do
       let (:params) { {
         :ensure   => 'present',
-        :imq_home => '/tmp',
+        :imq_home => '/tmp/imq',
         :imq_port => '7777'
       } }
 
@@ -79,8 +84,14 @@ describe 'sunappserver::config::imq' do
         :path    => '/etc/sysconfig/imq'
       )}
 
+      it { should contain_file('/tmp/imq').with(
+        :ensure  => 'directory',
+        :owner   => 'appserv',
+        :mode    => '0750'
+      )}
+
       it { should contain_file('sysconfig/imq').with(
-        :content => /^IMQHOME="\/tmp"$/
+        :content => /^IMQHOME="\/tmp\/imq"$/
       )}
 
       it { should contain_file('sysconfig/imq').with(

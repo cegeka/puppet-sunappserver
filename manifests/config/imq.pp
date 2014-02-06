@@ -29,6 +29,12 @@ class sunappserver::config::imq(
         path    => '/etc/sysconfig/imq',
         content => template('sunappserver/config/imq.erb')
       }
+
+      file { $imq_home :
+        ensure => 'directory',
+        owner  => $runas,
+        mode   => '0750'
+      }
     }
     'absent': {
       file { 'service/imq':
@@ -41,6 +47,10 @@ class sunappserver::config::imq(
         path   => '/etc/sysconfig/imq'
       }
 
+      file { $imq_home :
+        ensure => 'absent',
+        force  => true
+      }
     }
     default: {
       fail('Class[sunappserver::config::imq]: parameter ensure must be present or absent')

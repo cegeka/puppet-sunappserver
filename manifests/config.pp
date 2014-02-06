@@ -6,12 +6,6 @@ class sunappserver::config (
 
   include sunappserver::params
 
-  file { $imq_home :
-    ensure => directory,
-    owner  => $runas,
-    group  => 'appserv'
-  }
-
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${runas} ${sunappserver::params::appserv_installroot}",
     unless  => "/usr/bin/test `/usr/bin/stat -c %U ${sunappserver::params::appserv_installroot} | grep ${runas}`",

@@ -13,7 +13,6 @@ describe 'sunappserver::config' do
 
     it { should contain_class('sunappserver::params') }
 
-    it { should contain_file('/opt/appserver/imq').with_owner('appserv') }
     it { should contain_augeas('domain/configs/config/jms-service/type/REMOTE') }
 
   end

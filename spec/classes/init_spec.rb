@@ -56,14 +56,14 @@ describe 'sunappserver' do
       it { should contain_class('sunappserver::config').with_imq_type('REMOTE') }
       it { should contain_class('sunappserver::config').with_imq_home('/opt/appserver/imq') }
 
-      it { should contain_sunappserver__config__service('domain1').with_runas('appserv') }
-      it { should contain_sunappserver__config__service('domain1').with_appserv_installroot('/opt/appserver') }
+      it { should contain_sunappserver__config__domain('domain1').with_runas('appserv') }
+      it { should contain_sunappserver__config__domain('domain1').with_appserv_installroot('/opt/appserver') }
 
       it { should contain_class('sunappserver::service').with_ensure('running') }
       it { should contain_class('sunappserver::service').with_enable(true) }
 
       it { should contain_class('sunappserver::config').with_notify('Class[Sunappserver::Service]') }
-      it { should contain_sunappserver__config__service('domain1').with_notify('Class[Sunappserver::Service]') }
+      it { should contain_sunappserver__config__domain('domain1').with_notify('Class[Sunappserver::Service]') }
 
       # Light weight version of the anchor pattern
       it { should contain_class('sunappserver::config').with_before('Class[Sunappserver]') }
@@ -83,18 +83,13 @@ describe 'sunappserver' do
       it { should_not contain_class('sunappserver::imq::service') }
     end
 
-    context 'with appserv_installroot and use_default_domain => false' do
+    context 'with appserv_installroot => /tmp and use_default_domain => false' do
       let (:params) { {
         :appserv_installroot => '/tmp',
         :use_default_domain  => false
       } }
 
-      it { should contain_sunappserver__config__service('domain1').with_ensure('absent') }
-      it { should contain_file('/tmp/domains/domain1').with(
-        :ensure => 'absent',
-        :force  => true
-      )}
-
+      it { should contain_sunappserver__config__domain('domain1').with_ensure('absent') }
       it { should_not contain_class('sunappserver::service') }
     end
   end
