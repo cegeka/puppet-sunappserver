@@ -35,7 +35,8 @@ describe 'sunappserver::config::domain' do
           it { should contain_sunappserver__config__domain('foodomain').with(
             :ensure              => 'present',
             :appserv_installroot => '/opt/appserver',
-            :runas               => 'appserv'
+            :runas               => 'appserv',
+            :imq_type            => 'remote'
           )}
 
           it { should contain_file('service/sunappserver-foodomain').with(
@@ -73,6 +74,11 @@ describe 'sunappserver::config::domain' do
             :content => /^MAINTENANCE_FILE="\$\{APPSERVDIR\}\/\.maintenance"$/
           )}
 
+          it { should contain_augeas('foodomain/config/jms-service/type').with(
+            :lens    => 'Xml.lns',
+            :incl    => '/opt/appserver/domains/foodomain/config/domain.xml',
+            :changes => [ 'set domain/configs/config/jms-service/#attribute/type REMOTE' ]
+          )}
         end
 
         context 'with ensure => absent' do
@@ -94,9 +100,10 @@ describe 'sunappserver::config::domain' do
           )}
         end
 
-        context 'with runas => foo and appserv_installroot => /tmp' do
+        context 'with runas => foo, imq_type => embedded and appserv_installroot => /tmp' do
           let (:params) { {
             :runas               => 'foo',
+            :imq_type            => 'embedded',
             :appserv_installroot => '/tmp'
           } }
 
@@ -135,6 +142,11 @@ describe 'sunappserver::config::domain' do
             :content => /^MAINTENANCE_FILE="\$\{APPSERVDIR\}\/\.maintenance"$/
           )}
 
+          it { should contain_augeas('foodomain/config/jms-service/type').with(
+            :lens    => 'Xml.lns',
+            :incl    => '/tmp/domains/foodomain/config/domain.xml',
+            :changes => [ 'set domain/configs/config/jms-service/#attribute/type EMBEDDED' ]
+          )}
         end
       end
 
@@ -202,6 +214,12 @@ describe 'sunappserver::config::domain' do
           :ensure => 'directory',
           :owner  => 'appserv',
           :mode   => '0750'
+        )}
+
+        it { should contain_augeas('domain1/config/jms-service/type').with(
+          :lens    => 'Xml.lns',
+          :incl    => '/opt/appserver/domains/domain1/config/domain.xml',
+          :changes => [ 'set domain/configs/config/jms-service/#attribute/type REMOTE' ]
         )}
       end
     end

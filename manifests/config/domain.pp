@@ -1,7 +1,8 @@
 define sunappserver::config::domain (
     $ensure              = 'present',
     $appserv_installroot = $sunappserver::params::appserv_installroot,
-    $runas               = 'appserv'
+    $runas               = 'appserv',
+    $imq_type            = 'remote'
   ) {
 
   if ! defined(Class['sunappserver::params']) {
@@ -11,6 +12,13 @@ define sunappserver::config::domain (
   $suffix = $title ? {
     'domain1' => '',
     default   => "-${title}"
+  }
+
+  case $imq_type {
+    'remote', 'embedded': { $imq_type_real = upcase($imq_type) }
+    default: {
+      fail("Sunappserver::Config::Domain[${title}]: parameter imq_type must be remote or embedded")
+    }
   }
 
   case $ensure {
@@ -54,6 +62,14 @@ define sunappserver::config::domain (
         ensure => 'directory',
         owner  => $runas,
         mode   => '0750'
+      }
+
+      augeas { "${title}/config/jms-service/type":
+        lens    => 'Xml.lns',
+        incl    => "${appserv_installroot}/domains/${title}/config/domain.xml",
+        changes => [
+          "set domain/configs/config/jms-service/#attribute/type ${imq_type_real}",
+        ]
       }
     }
     default: {
