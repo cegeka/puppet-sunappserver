@@ -46,17 +46,16 @@ describe 'sunappserver' do
       it { should contain_class('sunappserver').with_service_enable(true) }
       it { should contain_class('sunappserver').with_runas('appserv') }
       it { should contain_class('sunappserver').with_imq_type('remote') }
-      it { should contain_class('sunappserver').with_imq_home('/opt/appserver/imq') }
       it { should contain_class('sunappserver').with_imq_port('7676') }
       it { should contain_class('sunappserver').with_use_default_domain(true) }
 
       it { should contain_class('sunappserver::package').with_ensure('present') }
 
       it { should contain_class('sunappserver::config').with_runas('appserv') }
-      it { should contain_class('sunappserver::config').with_imq_type('REMOTE') }
-      it { should contain_class('sunappserver::config').with_imq_home('/opt/appserver/imq') }
+      it { should contain_class('sunappserver::config').with_appserv_installroot('/opt/appserver') }
 
       it { should contain_sunappserver__config__domain('domain1').with_runas('appserv') }
+      it { should contain_sunappserver__config__domain('domain1').with_imq_type('remote') }
       it { should contain_sunappserver__config__domain('domain1').with_appserv_installroot('/opt/appserver') }
 
       it { should contain_class('sunappserver::service').with_ensure('running') }

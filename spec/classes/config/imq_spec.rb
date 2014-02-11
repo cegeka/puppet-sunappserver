@@ -9,6 +9,7 @@ describe 'sunappserver::config::imq' do
   } }
 
   context 'without prior inclusion of class sunappserver::params' do
+    let (:pre_condition) {  }
 
     it { expect { subject }.to raise_error(
       Puppet::Error, /must include the sunappserver::params class before/
@@ -53,18 +54,18 @@ describe 'sunappserver::config::imq' do
       let (:params) { { } }
 
       it { should contain_class('sunappserver::config::imq').with(
-        :ensure   => 'present',
-        :runas    => 'appserv',
-        :imq_home => '/opt/appserver/imq',
-        :imq_port => '7676'
+        :ensure              => 'present',
+        :runas               => 'appserv',
+        :appserv_installroot => '/opt/appserver',
+        :imq_port            => '7676'
       )}
     end
 
-    context 'ensure => present, imq_home => /tmp/imq and imq_port => 7777' do
+    context 'ensure => present, appserv_installroot => /tmp and imq_port => 7777' do
       let (:params) { {
-        :ensure   => 'present',
-        :imq_home => '/tmp/imq',
-        :imq_port => '7777'
+        :ensure              => 'present',
+        :appserv_installroot => '/tmp',
+        :imq_port            => '7777'
       } }
 
       it { should contain_file('service/imq').with(
