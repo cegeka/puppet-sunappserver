@@ -44,10 +44,6 @@
 #               - Required: no
 #               - Content: 'running' | 'stopped'
 #
-# [*imq_home*] The home of the IMQ Message Broker (default: '/opt/appserver/imq').
-#                       - Required: no
-#                       - Content: String
-#
 # [*imq_port*] The port of the IMQ Message Broker (default: '7676').
 #                       - Required: no
 #                       - Content: String
@@ -75,7 +71,6 @@ class sunappserver (
   $runas               = 'appserv',
   $imq_type            = 'remote',
   $imq_state           = 'running',
-  $imq_home            = "${sunappserver::params::appserv_installroot}/imq",
   $imq_port            = $sunappserver::params::imq_port,
   $use_default_domain  = true
 ) inherits sunappserver::params {
@@ -97,12 +92,7 @@ class sunappserver (
   }
 
   case $imq_type {
-    'remote': {
-      $imq_type_real = upcase($imq_type)
-    }
-    'embedded': {
-      $imq_type_real = upcase($imq_type)
-    }
+    'remote', 'embedded': { $imq_type_real = $imq_type }
     default: {
       fail('Class[sunappserver]: parameter imq_type must be remote or embedded')
     }
@@ -115,13 +105,13 @@ class sunappserver (
 
   class { 'sunappserver::config':
     runas    => $runas,
-    imq_type => $imq_type_real,
-    imq_home => $imq_home
+    appserv_installroot => $appserv_installroot
   }
 
   if ( $use_default_domain == true ) {
-    sunappserver::config::service { 'domain1':
+    sunappserver::config::domain { 'domain1':
       runas               => $runas,
+      imq_type            => $imq_type_real,
       appserv_installroot => $appserv_installroot
     }
 
@@ -130,24 +120,21 @@ class sunappserver (
       enable => $service_enable
     }
 
-    Sunappserver::Config::Service['domain1'] ~> Class['sunappserver::service']
+    Sunappserver::Config::Domain['domain1'] ~> Class['sunappserver::service']
     Class['sunappserver::config'] ~> Class['sunappserver::service']
-  } else {
-    sunappserver::config::service { 'domain1':
-      ensure              => 'absent'
-    }
 
-    file { "${appserv_installroot}/domains/domain1":
-      ensure => 'absent',
-      force  => true
+  } else {
+
+    sunappserver::config::domain { 'domain1':
+      ensure              => 'absent',
+      appserv_installroot => $appserv_installroot
     }
   }
 
-
   if $imq_type == 'remote' {
     class { 'sunappserver::config::imq':
-      runas => $runas
-      }
+      runas    => $runas,
+    }
 
     class { 'sunappserver::imq::service':
       ensure => $imq_state_real
@@ -158,8 +145,8 @@ class sunappserver (
     if ( $use_default_domain == true ) {
       Class['sunappserver::imq::service'] ~> Class['sunappserver::service']
     }
-  }
-  else {
+  } else {
+
     class { 'sunappserver::config::imq':
       ensure => 'absent'
     }

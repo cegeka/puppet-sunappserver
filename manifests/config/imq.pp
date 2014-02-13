@@ -1,13 +1,15 @@
 class sunappserver::config::imq(
-    $ensure   = 'present',
-    $runas    = 'appserv',
-    $imq_home = "${sunappserver::params::appserv_installroot}/imq",
-    $imq_port = "${sunappserver::params::imq_port}",
+    $ensure              = 'present',
+    $runas               = 'appserv',
+    $appserv_installroot = $sunappserver::params::appserv_installroot,
+    $imq_port            = $sunappserver::params::imq_port,
   ) {
 
   if ! defined(Class['sunappserver::params']) {
     fail('You must include the sunappserver::params class before using this class')
   }
+
+  $imq_home = "${appserv_installroot}/imq"
 
   case $ensure {
     'present': {
@@ -29,6 +31,12 @@ class sunappserver::config::imq(
         path    => '/etc/sysconfig/imq',
         content => template('sunappserver/config/imq.erb')
       }
+
+      file { $imq_home:
+        ensure => 'directory',
+        owner  => $runas,
+        mode   => '0750'
+      }
     }
     'absent': {
       file { 'service/imq':
@@ -41,6 +49,10 @@ class sunappserver::config::imq(
         path   => '/etc/sysconfig/imq'
       }
 
+      file { $imq_home:
+        ensure => 'absent',
+        force  => true
+      }
     }
     default: {
       fail('Class[sunappserver::config::imq]: parameter ensure must be present or absent')

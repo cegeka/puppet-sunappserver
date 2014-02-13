@@ -1,7 +1,8 @@
-define sunappserver::config::service (
+define sunappserver::config::domain (
     $ensure              = 'present',
     $appserv_installroot = $sunappserver::params::appserv_installroot,
-    $runas               = 'appserv'
+    $runas               = 'appserv',
+    $imq_type            = 'remote'
   ) {
 
   if ! defined(Class['sunappserver::params']) {
@@ -11,6 +12,13 @@ define sunappserver::config::service (
   $suffix = $title ? {
     'domain1' => '',
     default   => "-${title}"
+  }
+
+  case $imq_type {
+    'remote', 'embedded': { $imq_type_real = upcase($imq_type) }
+    default: {
+      fail("Sunappserver::Config::Domain[${title}]: parameter imq_type must be remote or embedded")
+    }
   }
 
   case $ensure {
@@ -25,6 +33,11 @@ define sunappserver::config::service (
         ensure => $ensure,
         path   => "/etc/sysconfig/sunappserver${suffix}"
       }
+
+      file { "${appserv_installroot}/domains/${title}":
+        ensure => $ensure,
+        force  => true
+      }
     }
     'present': {
       file { "service/sunappserver-${title}":
@@ -33,7 +46,7 @@ define sunappserver::config::service (
         group  => 'root',
         mode   => '0755',
         path   => "/etc/init.d/sunappserver${suffix}",
-        source => 'puppet:///modules/sunappserver/config/service'
+        source => 'puppet:///modules/sunappserver/config/domain'
       }
 
       file { "sysconfig/sunappserver-${title}":
@@ -44,9 +57,23 @@ define sunappserver::config::service (
         path    => "/etc/sysconfig/sunappserver${suffix}",
         content => template('sunappserver/config/sysconfig.erb')
       }
+
+      file { "${appserv_installroot}/domains/${title}":
+        ensure => 'directory',
+        owner  => $runas,
+        mode   => '0750'
+      }
+
+      augeas { "${title}/config/jms-service/type":
+        lens    => 'Xml.lns',
+        incl    => "${appserv_installroot}/domains/${title}/config/domain.xml",
+        changes => [
+          "set domain/configs/config/jms-service/#attribute/type ${imq_type_real}",
+        ]
+      }
     }
     default: {
-      fail("Sunappserver::Config::Service['${title}']: parameter ensure must be present or absent")
+      fail("Sunappserver::Config::Domain['${title}']: parameter ensure must be present or absent")
     }
   }
 }

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'sunappserver::config::service' do
+describe 'sunappserver::config::domain' do
   context 'with title foodomain' do
     let (:title) { 'foodomain' }
 
@@ -32,10 +32,11 @@ describe 'sunappserver::config::service' do
         context 'with default parameters' do
           let (:params) { { } }
 
-          it { should contain_sunappserver__config__service('foodomain').with(
+          it { should contain_sunappserver__config__domain('foodomain').with(
             :ensure              => 'present',
             :appserv_installroot => '/opt/appserver',
-            :runas               => 'appserv'
+            :runas               => 'appserv',
+            :imq_type            => 'remote'
           )}
 
           it { should contain_file('service/sunappserver-foodomain').with(
@@ -44,7 +45,7 @@ describe 'sunappserver::config::service' do
             :group  => 'root',
             :mode   => '0755',
             :path   => '/etc/init.d/sunappserver-foodomain',
-            :source => 'puppet:///modules/sunappserver/config/service'
+            :source => 'puppet:///modules/sunappserver/config/domain'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -53,6 +54,12 @@ describe 'sunappserver::config::service' do
             :group  => 'root',
             :mode   => '0644',
             :path   => '/etc/sysconfig/sunappserver-foodomain'
+          )}
+
+          it { should contain_file('/opt/appserver/domains/foodomain').with(
+            :ensure => 'directory',
+            :owner  => 'appserv',
+            :mode   => '0750'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -67,6 +74,11 @@ describe 'sunappserver::config::service' do
             :content => /^MAINTENANCE_FILE="\$\{APPSERVDIR\}\/\.maintenance"$/
           )}
 
+          it { should contain_augeas('foodomain/config/jms-service/type').with(
+            :lens    => 'Xml.lns',
+            :incl    => '/opt/appserver/domains/foodomain/config/domain.xml',
+            :changes => [ 'set domain/configs/config/jms-service/#attribute/type REMOTE' ]
+          )}
         end
 
         context 'with ensure => absent' do
@@ -81,11 +93,17 @@ describe 'sunappserver::config::service' do
             :ensure => 'absent',
             :path   => '/etc/sysconfig/sunappserver-foodomain'
           )}
+
+          it { should contain_file('/opt/appserver/domains/foodomain').with(
+            :ensure => 'absent',
+            :force  => true
+          )}
         end
 
-        context 'with runas => foo and appserv_installroot => /tmp' do
+        context 'with runas => foo, imq_type => embedded and appserv_installroot => /tmp' do
           let (:params) { {
             :runas               => 'foo',
+            :imq_type            => 'embedded',
             :appserv_installroot => '/tmp'
           } }
 
@@ -95,7 +113,7 @@ describe 'sunappserver::config::service' do
             :group  => 'root',
             :mode   => '0755',
             :path   => '/etc/init.d/sunappserver-foodomain',
-            :source => 'puppet:///modules/sunappserver/config/service'
+            :source => 'puppet:///modules/sunappserver/config/domain'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -104,6 +122,12 @@ describe 'sunappserver::config::service' do
             :group  => 'root',
             :mode   => '0644',
             :path   => '/etc/sysconfig/sunappserver-foodomain'
+          )}
+
+          it { should contain_file('/tmp/domains/foodomain').with(
+            :ensure => 'directory',
+            :owner  => 'foo',
+            :mode   => '0750'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -118,6 +142,11 @@ describe 'sunappserver::config::service' do
             :content => /^MAINTENANCE_FILE="\$\{APPSERVDIR\}\/\.maintenance"$/
           )}
 
+          it { should contain_augeas('foodomain/config/jms-service/type').with(
+            :lens    => 'Xml.lns',
+            :incl    => '/tmp/domains/foodomain/config/domain.xml',
+            :changes => [ 'set domain/configs/config/jms-service/#attribute/type EMBEDDED' ]
+          )}
         end
       end
 
@@ -154,6 +183,11 @@ describe 'sunappserver::config::service' do
           :ensure => 'absent',
           :path   => '/etc/sysconfig/sunappserver'
         )}
+
+        it { should contain_file('/opt/appserver/domains/domain1').with(
+          :ensure => 'absent',
+          :force  => true
+        )}
       end
 
       context 'with default parameters' do
@@ -165,7 +199,7 @@ describe 'sunappserver::config::service' do
           :group  => 'root',
           :mode   => '0755',
           :path   => '/etc/init.d/sunappserver',
-          :source => 'puppet:///modules/sunappserver/config/service'
+          :source => 'puppet:///modules/sunappserver/config/domain'
         )}
 
         it { should contain_file('sysconfig/sunappserver-domain1').with(
@@ -174,6 +208,18 @@ describe 'sunappserver::config::service' do
           :group  => 'root',
           :mode   => '0644',
           :path   => '/etc/sysconfig/sunappserver'
+        )}
+
+        it { should contain_file('/opt/appserver/domains/domain1').with(
+          :ensure => 'directory',
+          :owner  => 'appserv',
+          :mode   => '0750'
+        )}
+
+        it { should contain_augeas('domain1/config/jms-service/type').with(
+          :lens    => 'Xml.lns',
+          :incl    => '/opt/appserver/domains/domain1/config/domain.xml',
+          :changes => [ 'set domain/configs/config/jms-service/#attribute/type REMOTE' ]
         )}
       end
     end
