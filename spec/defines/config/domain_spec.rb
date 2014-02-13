@@ -7,6 +7,7 @@ describe 'sunappserver::config::domain' do
     let (:title) { 'foodomain' }
 
     context 'without prior inclusion of class sunappserver::params' do
+      let (:pre_condition) { }
 
       it { expect { subject }.to raise_error(
         Puppet::Error, /must include the sunappserver::params class before/
