@@ -9,7 +9,7 @@ describe 'sunappserver::config::imq' do
   } }
 
   context 'without prior inclusion of class sunappserver::params' do
-    let (:pre_condition) {  }
+    let (:pre_condition) { '' }
 
     it { expect { subject }.to raise_error(
       Puppet::Error, /must include the sunappserver::params class before/
