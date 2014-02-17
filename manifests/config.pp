@@ -3,7 +3,9 @@ class sunappserver::config (
     $appserv_installroot = "${sunappserver::params::appserv_installroot}"
   ) {
 
-  include sunappserver::params
+  if ! defined(Class['sunappserver::params']) {
+    fail('You must include the sunappserver::params class before using this class')
+  }
 
   exec { 'modify-ownership-for-appserver-root' :
     command => "/bin/chown -R ${runas} ${appserv_installroot}",
