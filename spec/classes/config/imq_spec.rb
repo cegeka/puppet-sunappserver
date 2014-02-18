@@ -43,11 +43,6 @@ describe 'sunappserver::config::imq' do
         :ensure => 'absent',
         :path   => '/etc/sysconfig/imq'
       )}
-
-      it { should contain_file('/opt/appserver/imq').with(
-        :ensure => 'absent',
-        :force  => true
-      )}
     end
 
     context 'with default parameters' do

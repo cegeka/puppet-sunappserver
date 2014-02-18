@@ -48,11 +48,6 @@ class sunappserver::config::imq(
         ensure => 'absent',
         path   => '/etc/sysconfig/imq'
       }
-
-      file { $imq_home:
-        ensure => 'absent',
-        force  => true
-      }
     }
     default: {
       fail('Class[sunappserver::config::imq]: parameter ensure must be present or absent')
