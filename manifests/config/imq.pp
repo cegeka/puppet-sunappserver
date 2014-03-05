@@ -33,9 +33,16 @@ class sunappserver::config::imq(
       }
 
       file { $imq_home:
-        ensure => 'directory',
+        ensure  => directory,
+        owner   => $runas,
+        mode    => '0750',
+        require => Class['sunappserver::package']
+      }
+
+      file { '/data/imq':
+        ensure => directory,
         owner  => $runas,
-        mode   => '0750'
+        mode   => '0755'
       }
     }
     'absent': {
