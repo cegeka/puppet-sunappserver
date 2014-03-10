@@ -60,7 +60,7 @@ describe 'sunappserver::config::domain' do
           it { should contain_file('/opt/appserver/domains/foodomain').with(
             :ensure => 'directory',
             :owner  => 'appserv',
-            :mode   => '0750'
+            :mode   => '0770'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -128,7 +128,7 @@ describe 'sunappserver::config::domain' do
           it { should contain_file('/tmp/domains/foodomain').with(
             :ensure => 'directory',
             :owner  => 'foo',
-            :mode   => '0750'
+            :mode   => '0770'
           )}
 
           it { should contain_file('sysconfig/sunappserver-foodomain').with(
@@ -214,7 +214,7 @@ describe 'sunappserver::config::domain' do
         it { should contain_file('/opt/appserver/domains/domain1').with(
           :ensure => 'directory',
           :owner  => 'appserv',
-          :mode   => '0750'
+          :mode   => '0770'
         )}
 
         it { should contain_augeas('domain1/config/jms-service/type').with(
