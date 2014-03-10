@@ -11,4 +11,11 @@ class sunappserver::config (
     command => "/bin/chown -R ${runas} ${appserv_installroot}",
     unless  => "/usr/bin/test `/usr/bin/stat -c %U ${appserv_installroot} | grep ${runas}`",
   }
+
+  file { "${appserv_installroot}/domains":
+    ensure => 'directory',
+    owner  => $runas,
+    mode   => '0770'
+  }
+
 }
