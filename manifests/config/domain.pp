@@ -61,7 +61,7 @@ define sunappserver::config::domain (
       file { "${appserv_installroot}/domains/${title}":
         ensure => 'directory',
         owner  => $runas,
-        mode   => '0750'
+        mode   => '0770'
       }
 
       augeas { "${title}/config/jms-service/type":
