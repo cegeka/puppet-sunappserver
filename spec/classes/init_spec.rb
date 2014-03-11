@@ -14,7 +14,7 @@ describe 'sunappserver' do
         let (:params) { { :service_state => 'foo' } }
 
         it { expect { subject }.to raise_error(
-          Puppet::Error, /parameter service_state must be running or stopped/
+          Puppet::Error, /parameter service_state must be running, stopped or unmanaged/
         )}
       end
 
@@ -31,7 +31,7 @@ describe 'sunappserver' do
       let (:params) { { :service_state => 'foo' } }
 
       it { expect { subject }.to raise_error(
-        Puppet::Error, /parameter service_state must be running or stopped/
+        Puppet::Error, /parameter service_state must be running, stopped or unmanaged/
       )}
     end
 

@@ -30,7 +30,7 @@
 #
 # [*service_enable*] The state of the Application Server default domain service (default: 'running')
 #                    - Required: no
-#                    - Content: 'running' | 'stopped'
+#                    - Content: 'running' | 'stopped' | 'unmanaged'
 #
 # [*runas*] The user under which the Application Server process is running (default: 'appserv').
 #                       - Required: no
@@ -42,7 +42,7 @@
 #
 # [*imq_state*] The state of the IMQ Message Broker service (if the type is remote) (default: 'running')
 #               - Required: no
-#               - Content: 'running' | 'stopped'
+#               - Content: 'running' | 'stopped' | 'unmanaged'
 #
 # [*imq_port*] The port of the IMQ Message Broker (default: '7676').
 #                       - Required: no
@@ -80,14 +80,14 @@ class sunappserver (
   case $service_state {
     'running', 'stopped', 'unmanaged': { $service_state_real = $service_state }
     default: {
-      fail('Class[sunappserver]: parameter service_state must be running or stopped')
+      fail('Class[sunappserver]: parameter service_state must be running, stopped or unmanaged')
     }
   }
 
   case $imq_state {
     'running', 'stopped', 'unmanaged': { $imq_state_real = $imq_state }
     default: {
-      fail('Class[sunappserver]: parameter imq_state must be running or stopped')
+      fail('Class[sunappserver]: parameter imq_state must be running, stopped or unmanaged')
     }
   }
 

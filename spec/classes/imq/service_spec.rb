@@ -14,7 +14,7 @@ describe 'sunappserver::imq::service' do
     } }
 
     it { expect { subject }.to raise_error(
-      Puppet::Error, /parameter ensure must be running or stopped/
+      Puppet::Error, /parameter ensure must be running, stopped or unmanaged/
     )}
   end
 
