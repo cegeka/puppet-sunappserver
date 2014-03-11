@@ -78,14 +78,14 @@ class sunappserver (
   include stdlib
 
   case $service_state {
-    'running', 'stopped': { $service_state_real = $service_state }
+    'running', 'stopped', 'unmanaged': { $service_state_real = $service_state }
     default: {
       fail('Class[sunappserver]: parameter service_state must be running or stopped')
     }
   }
 
   case $imq_state {
-    'running', 'stopped': { $imq_state_real = $imq_state }
+    'running', 'stopped', 'unmanaged': { $imq_state_real = $imq_state }
     default: {
       fail('Class[sunappserver]: parameter imq_state must be running or stopped')
     }
