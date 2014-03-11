@@ -11,8 +11,11 @@ class sunappserver::service (
         hasstatus => true
       }
     }
+    'unmanaged': {
+      notice('Class[sunappserver::service]: service is currently not being managed')
+    }
     default: {
-      fail("Class[sunappserver::service]: parameter ensure must be running or stopped")
+      fail('Class[sunappserver::service]: parameter ensure must be running, stopped or unmanaged')
     }
   }
 }
