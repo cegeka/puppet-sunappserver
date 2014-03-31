@@ -1,4 +1,8 @@
-class sunappserver::package($ensure=undef, $appserver_version=undef) {
+class sunappserver::package(
+  $ensure=undef,
+  $appserver_version=undef,
+  $versionlock=false
+) {
 
   include sunappserver::params
 
@@ -18,6 +22,16 @@ class sunappserver::package($ensure=undef, $appserver_version=undef) {
 
   package { 'sunappserver':
     ensure   => $real_appserver_ensure,
+  }
+
+  case $versionlock {
+    true: {
+      packagelock { 'sunappserver': }
+    }
+    false: {
+      packagelock { 'sunappserver': ensure => absent }
+    }
+    default: { fail('Class[Sunappserver::Package]: parameter versionlock must be true or false')}
   }
 
 }
