@@ -19,6 +19,10 @@
 #                       - Required: no
 #                       - Content: String
 #
+# [*versionlock*] Whether to set a lock for the installed version of the Application Server (default: false).
+#                       - Required: no
+#                       - Content: Boolean
+#
 # [*appserv_installroot*] The installation directory of Application Server (default: '/opt/appserver')
 #                         - Required: no
 #                         - Content: String
@@ -65,6 +69,7 @@
 class sunappserver (
   $ensure              = 'present',
   $appserver_version   = undef,
+  $versionlock         = false,
   $appserv_installroot = $sunappserver::params::appserv_installroot,
   $service_state       = 'running',
   $service_enable      = true,
@@ -100,11 +105,12 @@ class sunappserver (
 
   class { 'sunappserver::package':
     ensure            => $ensure,
-    appserver_version => $appserver_version
+    appserver_version => $appserver_version,
+    versionlock       => $versionlock
   }
 
   class { 'sunappserver::config':
-    runas    => $runas,
+    runas               => $runas,
     appserv_installroot => $appserv_installroot
   }
 
