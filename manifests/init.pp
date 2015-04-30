@@ -110,12 +110,14 @@ class sunappserver (
   }
 
   class { 'sunappserver::config':
+    ensure              => $ensure,
     runas               => $runas,
     appserv_installroot => $appserv_installroot
   }
 
   if ( $use_default_domain == true ) {
     sunappserver::config::domain { 'domain1':
+      ensure              => $ensure,
       runas               => $runas,
       imq_type            => $imq_type_real,
       appserv_installroot => $appserv_installroot
@@ -139,7 +141,8 @@ class sunappserver (
 
   if $imq_type == 'remote' {
     class { 'sunappserver::config::imq':
-      runas    => $runas,
+      ensure => $ensure,
+      runas  => $runas,
     }
 
     class { 'sunappserver::imq::service':
