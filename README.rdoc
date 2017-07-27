@@ -1,6 +1,6 @@
 = puppet-sunappserver module
 
-{<img src='https://codex.cegeka.be/jenkins/job/puppet-sunappserver/badge/icon' />}[https://codex.cegeka.be/jenkins/job/puppet-sunappserver/]
+{<img src='https://jenkins-iac.cegeka.be/job/puppet-sunappserver/badge/icon' />}[https://jenkins-iac.cegeka.be/job/puppet-sunappserver/]
 
 This is the sunappserver module.
 
