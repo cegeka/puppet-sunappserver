@@ -30,3 +30,4 @@ If you created an extra domain, you can create the configuration and service scr
   sunappserver::config::domain { 'domain2':
     runas => 'foo'
   }
+
