@@ -13,7 +13,7 @@ describe 'sunappserver::package' do
 
     it { should contain_class('sunappserver::params') }
     it { should contain_package('sunappserver').with_ensure('9.1.01') }
-    it { should contain_packagelock('sunappserver').with_ensure('absent') }
+    it { should contain_yum__versionlock('0:sunappserver-9.1.01.*').with_ensure('absent') }
   end
 
   context 'with ensure => present and version => 9.1.01 and versionlock => true' do
@@ -21,7 +21,7 @@ describe 'sunappserver::package' do
 
     it { should contain_class('sunappserver::params') }
     it { should contain_package('sunappserver').with_ensure('9.1.01') }
-    it { should contain_packagelock('sunappserver') }
+    it { should contain_yum__versionlock('0:sunappserver-9.1.01.*') }
   end
 
 end
