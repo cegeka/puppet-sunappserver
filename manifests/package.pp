@@ -26,10 +26,10 @@ class sunappserver::package(
 
   case $versionlock {
     true: {
-      yum::versionlock { "0:sunappserver-${version}.*": }
+      yum::versionlock { "0:sunappserver-${appserver_version}.*": }
     }
     false: {
-      yum::versionlock { "0:sunappserver-${version}.*": ensure => absent }
+      yum::versionlock { "0:sunappserver-${appserver_version}.*": ensure => absent }
     }
     default: { fail('Class[Sunappserver::Package]: parameter versionlock must be true or false')}
   }
